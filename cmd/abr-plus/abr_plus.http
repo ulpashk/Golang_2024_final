@@ -1,0 +1,51 @@
+### Create Song Item
+POST localhost:8081/api/v1/menus
+Content-Type: application/json
+ Example for creating a new song Item
+{
+	"id": "1",
+	"title": "Dynamite",
+	"length": 4,
+	"albumId": 102
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Get Song Item
+GET localhost:8081/songs/1
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Update Song Item
+PUT localhost:8081/songs/1
+Content-Type: application/json
+
+{
+	"title": "Idol",
+	"length": 3,
+	"albumId": 102
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Delete Song Item
+DELETE localhost:8081/songs/1
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
