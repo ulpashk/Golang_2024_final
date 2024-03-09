@@ -52,7 +52,7 @@ func (app *application) run() {
 	r := mux.NewRouter()
 
 	// Create a new song
-	r.HandleFunc("/song", app.createSongHandler).Methods("POST")
+	r.HandleFunc("/songs", app.createSongHandler).Methods("POST")
 	// Get a specific song
 	r.HandleFunc("/songs/{songId:[0-9]+}", app.getSongHandler).Methods("GET")
 	// Update a specific song
