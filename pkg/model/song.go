@@ -37,7 +37,6 @@ func (s SongModel) Insert(song *Song) error {
 }
 
 
-
 // Getting a song by id
 func (s SongModel) Get(id int) (*Song, error) {
 	// Retrieve a specific menu item based on its ID.

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/ulpashk/Golang_2024/pkg/abr-plus/model"
+	"github.com/ulpashk/Golang_2024/pkg/model"
 )
 
 
@@ -157,14 +157,14 @@ func (app *application) deleteSongHandler(w http.ResponseWriter, r *http.Request
 }
 
 
-func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
+// func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+// 	dec := json.NewDecoder(r.Body)
+// 	dec.DisallowUnknownFields()
 
-	err := dec.Decode(dst)
-	if err != nil {
-		return err
-	}
+// 	err := dec.Decode(dst)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

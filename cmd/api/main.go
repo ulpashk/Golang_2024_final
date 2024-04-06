@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/ulpashk/Golang_2024/pkg/abr-plus/model"
+	"github.com/ulpashk/Golang_2024/pkg/model"
 
 	_ "github.com/lib/pq"
 )
