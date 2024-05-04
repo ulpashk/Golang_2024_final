@@ -2,12 +2,18 @@ version: '3.8'
 services:
   my-postgres:
     image: postgres
+    restart: always
     environment:
       POSTGRES_PASSWORD: Ulp@sh05
       POSTGRES_USER: postgres
       POSTGRES_DB: kpop
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   my-app:
     build: .
@@ -20,4 +26,5 @@ services:
       DB_PASS: Ulp@sh05
       DB_NAME: kpop
     depends_on:
-      - my-postgres
+      my-postgres:
+        condition: service_healthy
