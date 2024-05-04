@@ -1,6 +1,6 @@
 module goproject
 
-go 1.21.6
+go 1.16
 
 require (
 	github.com/julienschmidt/httprouter v1.3.0 // direct
