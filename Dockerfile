@@ -1,70 +1,33 @@
-# # Start from the official Golang image.
-# FROM golang:1.22.1 as builder
+# Step 1: Use the official Golang image as a builder.
+FROM golang:1.16 as builder
 
-# # Set the Current Working Directory inside the container
-# WORKDIR /app
-
-# # Copy go mod and sum files
-# COPY go.mod go.sum ./
-
-# # Copy migration files
-
-# # Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
-# RUN go mod download
-
-# # Copy the source code into the container
-# COPY . .
-
-# # Build the application, disable CGO to create a static binary
-# RUN CGO_ENABLED=0 GOOS=linux go build -o goproject ./cmd/api
-
-# # Use a smaller image to run the app
-# FROM alpine:latest  
-# RUN apk --no-cache add ca-certificates
-
-# WORKDIR /root/
-
-# RUN ls -la
-
-# # Copy the pre-built binary file from the previous stage
-# COPY --from=builder /app/goproject .
-# COPY --from=builder /app/migrations ./migrations
-
-# # Command to run the executable
-# CMD ["./goproject"]
-
-# Use the official Golang image to create a build artifact.
-# https://hub.docker.com/_/golang
-FROM golang:1.21.6 as builder
-
-# Set the Current Working Directory inside the container
+# Step 2: Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy go mod and sum files
+# Step 3: Copy the Go Module files
 COPY go.mod go.sum ./
 
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# Step 4: Download all dependencies.
 RUN go mod download
 
-# Copy the source code into the container
+# Step 5: Copy the source code into the container
 COPY . .
 
-# Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Step 6: Build the Go app
+RUN CGO_ENABLED=0 GOOS=linux go build -o myapp ./cmd/api
 
-# Start a new stage from scratch
-FROM alpine:latest
+# Step 7: Start from a smaller image
+FROM alpine:latest  
 
-RUN apk --no-cache add ca-certificates
-
+# Set the Current Working Directory inside the container
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage
-COPY --from=builder /app/main .
+COPY --from=builder /app/myapp .
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["./myapp"]
 
