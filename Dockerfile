@@ -16,7 +16,7 @@ RUN go mod download
 COPY . .
 
 # Build the application, disable CGO to create a static binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o demo-app ./cmd/abr-plus
+RUN CGO_ENABLED=0 GOOS=linux go build -o goproject ./cmd/api
 
 # Use a smaller image to run the app
 FROM alpine:latest  
@@ -27,8 +27,8 @@ WORKDIR /root/
 RUN ls -la
 
 # Copy the pre-built binary file from the previous stage
-COPY --from=builder /app/demo-app .
-COPY --from=builder /app/pkg/abr-plus/migrations ./migrations
+COPY --from=builder /app/goproject .
+COPY --from=builder /app/migrations ./migrations
 
 # Command to run the executable
-CMD ["./demo-app"]
+CMD ["./goproject"]
