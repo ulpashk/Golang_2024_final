@@ -34,7 +34,7 @@ func (a AlbumModel) Insert(album *Album) error {
 	// Define the SQL query for inserting a new record in the movies table and returning
 	// the system-generated data.
 	query := `
-		INSERT INTO albums(title, genre, tracks, group_id)
+		INSERT INTO album(title, genre, tracks, group_id)
 		VALUES ($1, $2, $3, $4)
 		RETURNING album_id, title, genre, tracks, group_id;`
 
@@ -61,7 +61,7 @@ func (a AlbumModel) Get(id int64) (*Album, error) {
 	// Retrieve a specific menu item based on its ID.
 	query := `
 		SELECT album_id, title, genre, tracks, group_id
-		FROM albums
+		FROM album
 		WHERE album_id = $1;`
 
 	var album Album
@@ -84,7 +84,7 @@ func (a AlbumModel) Get(id int64) (*Album, error) {
 // Add a placeholder method for updating a specific record in the movies table.
 func (a AlbumModel) Update(album *Album) error {
 	query := `
-		UPDATE albums
+		UPDATE album
 		SET title = $1, genre = $2, tracks = $3, group_id = $4
 		WHERE album_id = $5
 		RETURNING album_id, title, genre, tracks, group_id;
@@ -105,7 +105,7 @@ func (a AlbumModel) Delete(id int64) error {
 	}
 
 	query := `
-		DELETE FROM albums
+		DELETE FROM album
 		WHERE album_id = $1
 		`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -140,7 +140,7 @@ func (a AlbumModel) GetAll(title string, genre string, tracks int, filters Filte
 	// Construct the SQL query to retrieve all movie records.
 	query :=  fmt.Sprintf(`
 		SELECT count(*) OVER(), album_id, title, genre, tracks, group_id
-		FROM albums
+		FROM album
 		WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
 		AND (to_tsvector('simple', genre) @@ plainto_tsquery('simple', $2) OR $2 = '')
 		AND (tracks = $3 OR $3 = 1)
