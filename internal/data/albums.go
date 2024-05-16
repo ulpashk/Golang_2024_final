@@ -7,8 +7,6 @@ import (
 	"errors"
 	"time"
 	"fmt"
-	// "log"
-
 )
 
 type Album struct{
@@ -28,8 +26,6 @@ func ValidateAlbum(v *validator.Validator, album *Album){
 
 type AlbumModel struct {
 	DB *sql.DB
-	// InfoLog  *log.Logger
-	// ErrorLog *log.Logger
 }
 
 func (a AlbumModel) Insert(album *Album) error {

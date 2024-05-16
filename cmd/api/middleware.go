@@ -38,21 +38,15 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		// Extract the actual authentication toekn from the header parts
 		token := headerParts[1]
 
-		// Validate the token to make sure it is in a sensible format.
 		v := validator.New()
 
-		// If the token isn't valid, use the invalidAuthenticationtokenResponse
-		// helper to send a response, rather than the failedValidatedResponse helper.
 		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
 			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}
 
-		// Retrieve the details of the user associated with the authentication token.
-		// call invalidAuthenticationTokenResponse if no matching record was found.
 		user, err := app.models.Users.GetForToken(data.ScopeAuthentication, token)
 		if err != nil {
 			switch {
@@ -64,15 +58,12 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		// Call the contextSetUser healer to add the user information to the request context.
 		r = app.contextSetUser(r, user)
 
-		// Call next handler in chain
 		next.ServeHTTP(w, r)
 	})
 }
 
-// requireAuthenticatedUser checks that the user is not anonymous (i.e., they are authenticated).
 func (app *application) requireAuthenticatedUser(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := app.contextGetUser(r)
@@ -85,7 +76,6 @@ func (app *application) requireAuthenticatedUser(next http.HandlerFunc) http.Han
 }
 
 func (app *application) requireActivatedUser(next http.HandlerFunc) http.HandlerFunc {
-	// Rather than returning this http.HandlerFunc we assign it to the variable fn.
 	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := app.contextGetUser(r)
 		// Check that a user is activated.
@@ -95,35 +85,29 @@ func (app *application) requireActivatedUser(next http.HandlerFunc) http.Handler
 		}
 		next.ServeHTTP(w, r)
 	})
-	// Wrap fn with the requireAuthenticatedUser() middleware before returning it.
+
 	return app.requireAuthenticatedUser(fn)
 }
 	
 
 func (app *application) requirePermission(code string, next http.HandlerFunc) http.HandlerFunc {
 	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Retrieve the user from the request context.
 		user := app.contextGetUser(r)
-
-		// Get the slice of permission for the user
 		permissions, err := app.models.Permissions.GetAllForUser(user.ID)
 		if err != nil {
 			app.serverErrorResponse(w, r, err)
 			return
 		}
 
-		// Check if the slice includes the required permission. If it doesn't, then return a 403
-		// Forbidden response.
 		if !permissions.Include(code) {
 			app.notPermittedResponse(w, r)
 			return
 		}
 
-		// Otherwise, they have the required permission so we call the next handler in the chain.
 		next.ServeHTTP(w, r)
 	})
 
-	// Wrap this with the requireActivatedUser middleware before returning
+
 	return app.requireActivatedUser(fn)
 }
 	

@@ -22,27 +22,18 @@ func (app *application) createGroupHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// Copy the values from the input struct to a new Song struct.
-
 	group := &data.Group{
 		Name:    input.Name,
 		Num_of_members:   input.Num_of_members,
 	}
 
-	// Initialize a new Validator instance.
 	v := validator.New()
 
-	// Call the ValidateSong() function and return a response containing the errors if
-	// any of the checks fail.
 	if data.ValidateGroup(v, group); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
-
-	// Call the Insert() method on our songs model, passing in a pointer to the
-	// validated song struct. This will create a record in the database and update the
-	// song struct with the system-generated information.
 	err = app.models.Groups.Insert(group)
 
 	if err != nil {
@@ -50,14 +41,8 @@ func (app *application) createGroupHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// When sending a HTTP response, we want to include a Location header to let the
-	// client know which URL they can find the newly-created resource at. We make an
-	// empty http.Header map and then use the Set() method to add a new Location header,
-	// interpolating the system-generated ID for our new movie in the URL.
 	headers := make(http.Header)
 	headers.Set("Location", fmt.Sprintf("/v1/groups/%d", group.Id))
-	// Write a JSON response with a 201 Created status code, the song data in the
-	// response body, and the Location header.
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"group": group}, headers)
 	if err != nil {

@@ -14,14 +14,17 @@ func (app *application) routes() http.Handler {
 
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
+	//healthcheck router
 	router.HandlerFunc(http.MethodGet, "/api/v1/healthcheck", app.healthcheckHandler)
 
+	//groups router
 	router.HandlerFunc(http.MethodGet, "/api/v1/groups", app.requirePermission("read", app.listGroupsHandler))
 	router.HandlerFunc(http.MethodPost, "/api/v1/groups", app.requirePermission("read", app.createGroupHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/groups/:id", app.requirePermission("read", app.showGroupHandler))
 	router.HandlerFunc(http.MethodPut, "/api/v1/groups/:id", app.requirePermission("read", app.updateGroupHandler))
 	router.HandlerFunc(http.MethodDelete, "/api/v1/groups/:id", app.requirePermission("write", app.deleteGroupHandler))
 
+	//albums router
 	router.HandlerFunc(http.MethodGet, "/api/v1/albums", app.requirePermission("read", app.listAlbumsHandler))
 	router.HandlerFunc(http.MethodPost, "/api/v1/albums", app.requirePermission("read", app.createAlbumHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/albums/:id", app.requirePermission("read", app.showAlbumHandler))
@@ -29,6 +32,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodDelete, "/api/v1/albums/:id", app.requirePermission("write", app.deleteAlbumHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/groups/:id/albums", app.requirePermission("read", app.getAlbumsByGroupHandler))
 
+	//songs router
 	router.HandlerFunc(http.MethodGet, "/api/v1/songs", app.requirePermission("read", app.listSongsHandler))
 	router.HandlerFunc(http.MethodPost, "/api/v1/songs", app.requirePermission("read", app.createSongHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/songs/:id", app.requirePermission("read", app.showSongHandler))
@@ -36,6 +40,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodDelete, "/api/v1/songs/:id", app.requirePermission("write", app.deleteSongHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/albums/:id/songs", app.requirePermission("read", app.getSongsByAlbum))
 
+	//users router
 	router.HandlerFunc(http.MethodPost, "/api/v1/users", app.registerUserHandler)
 	router.HandlerFunc(http.MethodPut, "/api/v1/users/activated", app.activateUserHandler)
 	router.HandlerFunc(http.MethodPost, "/api/v1/tokens/login", app.createAuthenticationTokenHandler)

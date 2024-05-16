@@ -24,7 +24,6 @@ func (app *application) createAlbumHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	album := &data.Album{
-		// Id:       input.Id,
 		Title:    input.Title,
 		Genre:    input.Genre,
 		Tracks:   input.Tracks,
