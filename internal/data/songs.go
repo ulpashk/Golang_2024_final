@@ -138,7 +138,6 @@ func (s SongModel) Delete(id int64) error {
 // using them right now, we've set this up to accept the various filter parameters as
 // arguments.
 func (s SongModel) GetAll(title string, length int, filters Filters) ([]*Song, Metadata, error) {
-	// Construct the SQL query to retrieve all movie records.
 	query :=  fmt.Sprintf(`
 		SELECT count(*) OVER(), song_id, title, length, album_id
 		FROM songs
@@ -146,48 +145,30 @@ func (s SongModel) GetAll(title string, length int, filters Filters) ([]*Song, M
 		AND (length = $2 OR $2 = 1)
 		ORDER BY %s %s, song_id
 		LIMIT $3 OFFSET $4`, filters.sortColumn(), filters.sortDirection())
-	
-/*SELECT count(*) OVER(), song_id, title, length, album_id
-		FROM song
-		WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
-		AND (length = $2 OR $2 = '{}')
-		ORDER BY %s %s, id ASC
-		LIMIT $3 OFFSET $4`
-		WHERE (title ILIKE $1 OR $1 = '')
-		*/
 
-	// Create a context with a 3-second timeout.
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	// As our SQL query now has quite a few placeholder parameters, let's collect the
-	// values for the placeholders in a slice. Notice here how we call the limit() and
-	// offset() methods on the Filters struct to get the appropriate values for the
-	// LIMIT and OFFSET clauses.
 	args := []interface{}{title, length, filters.limit(), filters.offset()}
 
-	// Use QueryContext() to execute the query. This returns a sql.Rows resultset
-	// containing the result.
 	rows, err := s.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, Metadata{}, err
 	}
-	// Importantly, defer a call to rows.Close() to ensure that the resultset is closed
-	// before GetAll() returns.
+
 	defer rows.Close()
-	// Declare a totalRecords variable.
+
 	totalRecords := 0
-	// Initialize an empty slice to hold the movie data.
+
 	songs := []*Song{}
 
-	// Use rows.Next to iterate through the rows in the resultset.
+
 	for rows.Next() {
-		// Initialize an empty Movie struct to hold the data for an individual movie.
+
 		var song Song
-		// Scan the values from the row into the Movie struct. Again, note that we're
-		// using the pq.Array() adapter on the genres field here.
+
 		err := rows.Scan(
-			&totalRecords, // Scan the count from the window function into totalRecords.
+			&totalRecords, 
 			&song.Id,
 			&song.Title,
 			&song.Length,
@@ -196,18 +177,70 @@ func (s SongModel) GetAll(title string, length int, filters Filters) ([]*Song, M
 		if err != nil {
 			return nil, Metadata{}, err
 		}
-		// Add the Movie struct to the slice.
+
 		songs = append(songs, &song)
 	}
-	// When the rows.Next() loop has finished, call rows.Err() to retrieve any error
-	// that was encountered during the iteration.
+
 	if err = rows.Err(); err != nil {
 		return nil, Metadata{}, err
 	}
 
-	// Generate a Metadata struct, passing in the total record count and pagination
-	// parameters from the client.
 	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
-	// If everything went OK, then return the slice of movies.
+
 	return songs, metadata, nil
+}
+
+func (s SongModel) GetSongsByAlbum(id int64, title string, length int, filters Filters) ([]*Song, Metadata, error) {
+	query :=  fmt.Sprintf(`
+		SELECT count(*) OVER(), song_id, title, length, album_id
+		FROM songs
+		WHERE (album_id = $1)
+		AND (to_tsvector('simple', title) @@ plainto_tsquery('simple', $2) OR $2 = '')
+		AND (length = $3 OR $3 = 1)
+		ORDER BY %s %s, song_id
+		LIMIT $4 OFFSET $5`, filters.sortColumn(), filters.sortDirection())
+
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+	
+		args := []interface{}{id, title, length, filters.limit(), filters.offset()}
+	
+		rows, err := s.DB.QueryContext(ctx, query, args...)
+		if err != nil {
+			return nil, Metadata{}, err
+		}
+	
+		defer rows.Close()
+	
+		totalRecords := 0
+	
+		songs := []*Song{}
+	
+	
+		for rows.Next() {
+	
+			var song Song
+	
+			err := rows.Scan(
+				&totalRecords, 
+				&song.Id,
+				&song.Title,
+				&song.Length,
+				&song.Album_id,
+			)
+			if err != nil {
+				return nil, Metadata{}, err
+			}
+	
+			songs = append(songs, &song)
+		}
+	
+		if err = rows.Err(); err != nil {
+			return nil, Metadata{}, err
+		}
+	
+		metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
+	
+		return songs, metadata, nil
 }

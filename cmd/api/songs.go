@@ -229,4 +229,51 @@ func (app *application) listSongsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 }
+
+func (app *application) getSongsByAlbum(w http.ResponseWriter, r *http.Request) {
+	id, err := app.readIDParam(r)
+	if err != nil {
+		app.notFoundResponse(w, r)
+		return
+	}
+
+	var input struct {
+		Title    string `json:"title"`
+		Length   int    `json:"length"`
+		data.Filters
+	}
+
+	v := validator.New()
+
+	qs := r.URL.Query()
+
+	input.Title = app.readString(qs, "title", "")
+
+	input.Length = app.readInt(qs, "length", 1, v)
+	 
+	input.Filters.Page = app.readInt(qs, "page", 1, v)
+	input.Filters.PageSize = app.readInt(qs, "page_size", 30, v)
+
+	input.Filters.Sort = app.readString(qs, "sort", "song_id")
+
+	input.Filters.SortSafelist = []string{"song_id", "title", "length", "-song_id", "-title", "-length"}
+
+	if data.ValidateFilters(v, input.Filters); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	songs, metadata, err := app.models.Songs.GetSongsByAlbum(id, input.Title, input.Length, input.Filters)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 	
+	err = app.writeJSON(w, http.StatusOK, envelope{"songs": songs, "metadata": metadata}, nil)
+
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+
+}
+
