@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
+	// "strings"
 	"os"
 	"time"
 	"goproject/internal/data"
@@ -39,17 +39,17 @@ type config struct {
 	// 	rps float64
 	// 	burst int
 	// }
-	smtp struct {
-		host string
-		port int
-		username string
-		password string
-		sender string
-	}
-	cors struct {
-		trustedOrigins []string
-	}
-		
+	// smtp struct {
+	// 	host string
+	// 	port int
+	// 	username string
+	// 	password string
+	// 	sender string
+	// }
+	// cors struct {
+	// 	trustedOrigins []string
+	// }
+	
 }
 
 // Define an application struct to hold the dependencies for our HTTP handlers, helpers,
@@ -75,20 +75,20 @@ func main() {
 	// default to using our development DSN if no flag is provided.
 	// flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	// flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
-	flag.StringVar(&cfg.db.dsn, "db-dsn",  os.Getenv("DB_DSN"), "PostgreSQL DSN")
-	// flag.StringVar(&cfg.db.dsn, "db-dsn", "user=postgres password='Ulp@sh05' dbname=kpop sslmode=disable", "PostgreSQL DSN")
+	// flag.StringVar(&cfg.db.dsn, "db-dsn",  os.Getenv("DB_DSN"), "PostgreSQL DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", "user=postgres password='Ulp@sh05' dbname=kkpop sslmode=disable", "PostgreSQL DSN")
 
-	flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.mailtrap.io", "SMTP host")
-	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "0f1d85c09e6d8e", "SMTP username")
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "e89654b1c53c45", "SMTP password")
+	// flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.mailtrap.io", "SMTP host")
+	// flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
+	// flag.StringVar(&cfg.smtp.username, "smtp-username", "0f1d85c09e6d8e", "SMTP username")
+	// flag.StringVar(&cfg.smtp.password, "smtp-password", "e89654b1c53c45", "SMTP password")
 	// flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.alexedwards.net>", "SMTP sender")
 
 
-	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
-		cfg.cors.trustedOrigins = strings.Fields(val)
-		return nil
-	})
+	// flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
+	// 	cfg.cors.trustedOrigins = strings.Fields(val)
+	// 	return nil
+	// })
 
 	flag.Parse()
 

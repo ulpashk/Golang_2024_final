@@ -52,7 +52,7 @@ func (app *application) routes() http.Handler {
 
 	// Return the httprouter instance.
 	// return router
-	return app.enableCORS(app.authenticate(router))
+	return app.authenticate(router)
 	//return app.recoverPanic(app.enableCORS(app.rateLimit(app.authenticate(router))))
 
 }
