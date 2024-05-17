@@ -49,7 +49,7 @@ func main() {
 		migrations = fs.String("migrations", "", "Path to migration files folder. If not provided, migrations do not applied")
 		port       = fs.Int("port", 8081, "API server port")
 		env        = fs.String("env", "development", "Environment (development|staging|production)")
-		dbDsn      = fs.String("dsn", "postgresql://postgres:Ulp@sh05@localhost:5432/kkpop?sslmode=disable", "PostgreSQL DSN")
+		dbDsn      = fs.String("dsn", "postgresql://postgres:Ulp@sh05@db:5432/gopro?sslmode=disable", "PostgreSQL DSN")
 	)
 
 
